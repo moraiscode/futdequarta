@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fut de Quarta</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="css/pushy-buttons.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+
+    <script src="js/load_data.js"></script>
+    <script src="js/jogo.js"></script>
+    <script src="js/autocomplete.js"></script>
+
+    <!-- META SEO -->
+
+    <!-- SEO -->
+    <meta
+      name="description"
+      content="Gerencie partidas de futebol casuais com sorteio de times, controle de gols, substituições e estatísticas. Ideal para peladas semanais."
+    />
+    <meta
+      name="keywords"
+      content="futebol, pelada, fut de quarta, sorteio de times, controle de jogo, estatísticas futebol, time de futebol, partida amadora"
+    />
+    <meta name="author" content="Fut de Quarta" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph / Facebook -->
+    <meta
+      property="og:title"
+      content="Fut de Quarta – Gerenciador de Partidas de Futebol"
+    />
+    <meta
+      property="og:description"
+      content="Organize sua pelada semanal com sorteios, controle de tempo, gols e estatísticas. Interface amigável e dinâmica."
+    />
+    <meta property="og:image" content="otg.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://futdequarta.moraiscode.com/" />
+    <!-- substitua pelo domínio real -->
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Fut de Quarta – Gerenciador de Partidas de Futebol"
+    />
+    <meta
+      name="twitter:description"
+      content="Sorteio de times, placar, rotação e estatísticas para futebol recreativo."
+    />
+    <meta name="twitter:image" content="otg.png" />
+
+    <!-- FAVICON -->
+    <link
+      rel="icon"
+      type="image/png"
+      href="favicon/favicon-96x96.png"
+      sizes="96x96"
+    />
+    <link rel="icon" type="image/svg+xml" href="favicon/favicon.svg" />
+    <link rel="shortcut icon" href="favicon/favicon.ico" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="favicon/apple-touch-icon.png"
+    />
+    <meta name="apple-mobile-web-app-title" content="FutdeQuarta" />
+    <link rel="manifest" href="favicon/site.webmanifest" />
+  </head>
+  <body class="d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand navbar-custom navbar-no-collapse">
+      <div class="container-fluid navbar-spread">
+        <!-- Logo à esquerda -->
+        <a class="navbar-brand" href="#">
+          <img src="navbar.png" alt="Logo" class="navbar-logo" />
+        </a>
+
+        <!-- Links à direita -->
+        <ul class="navbar-nav d-flex flex-row">
+          <li class="nav-item me-3">
+            <a class="nav-link" href="#"
+              ><i class="fa-solid fa-trophy"></i> Ranking</a
+            >
+          </li>
+          <!-- <li class="nav-item">
+                <a class="nav-link" href="#">Suporte</a>
+            </li> -->
+        </ul>
+      </div>
+    </nav>
+
+    <main class="flex-fill">
+      <div class="container">
+        <div id="start" class="section">
+          <!-- <h2>Selecionar Jogadores</h2> -->
+          <p
+            class="text-muted"
+            style="font-size: 0.8rem !important; padding: 5px; margin-top: 5%"
+          >
+            Para pesquisar um jogador já cadastrado, digite a primeira letra do
+            nome. Caso contrário Digite o nome do jogador e clique em Adicionar:
+          </p>
+
+          <div
+            id="playerDebug"
+            style="font-size: 0.8rem !important; padding: 5px"
+            class="text-success"
+          ></div>
+
+          <ul id="playerList" class="list-group mb-3"></ul>
+          <ul id="autocompleteList" class="list-group"></ul>
+
+          <div class="input-group mb-3">
+            <input
+              type="text"
+              id="playerName"
+              class="form-control"
+              placeholder="Nome do jogador"
+            />
+            <button
+              class="pushy__btn pushy__btn--df pushy__btn--blue"
+              onclick="addPlayer()"
+              style="margin-top: 10px"
+            >
+              <i class="fa-solid fa-plus"></i> Adicionar jogador
+            </button>
+          </div>
+
+          <button
+            class="pushable"
+            onclick="sortTeams()"
+            style="margin-bottom: 30%; margin-top: 5%"
+          >
+            <span class="front">
+              <i class="fa-solid fa-shuffle"></i> Sortear times
+            </span>
+          </button>
+        </div>
+
+        <div id="game" class="section d-none">
+          <!-- <h2>Partida Atual</h2> -->
+          <h3 id="timer">10:00</h3>
+          <div class="progress" style="height: 5px">
+            <div
+              id="timerProgress"
+              class="progress-bar bg-success"
+              role="progressbar"
+              style="width: 100%"
+              aria-valuenow="100"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            ></div>
+          </div>
+          <div class="button-box">
+            <!-- INICIAR PARTIDA -->
+            <button
+              class="pushy__btn pushy__btn--md pushy__btn--green"
+              onclick="startMatch()"
+            >
+              <i class="fa-solid fa-person-walking"></i> Iniciar partida
+            </button>
+
+            <!-- <button class="btn btn-primary me-2" onclick="startMatch()">
+              <i class="fa-solid fa-person-walking"></i>Iniciar partida
+            </button> -->
+
+            <!-- ADICIONAR JOGADOR -->
+            <button
+              class="pushy__btn pushy__btn--md pushy__btn--blue"
+              data-bs-toggle="modal"
+              data-bs-target="#addPlayerModal"
+            >
+              <i class="fas fa-plus me-1"></i> Adicionar jogador
+            </button>
+
+            <!-- <button
+              class="btn btn-info me-2"
+              data-bs-toggle="modal"
+              data-bs-target="#addPlayerModal"
+            >
+              <i class="fas fa-plus me-1"></i>Adicionar jogador
+            </button> -->
+
+            <!-- ENCERRAR PARTIDA -->
+            <button
+              class="pushy__btn pushy__btn--md pushy__btn--red"
+              onclick="endDay()"
+            >
+              <i class="fas fa-sign-out-alt me-1"></i> Encerrar o dia
+            </button>
+
+            <!-- <button class="btn btn-danger" onclick="endDay()">
+              <i class="fas fa-sign-out-alt me-1"></i>Encerrar o dia
+            </button> -->
+          </div>
+          <div class="row">
+            <div class="col-12 col-md-6 team-box">
+              <h4>Time A</h4>
+              <ul id="teamA" class="list-group mb-2"></ul>
+              <select id="scorerA" class="form-select mb-2">
+                <option value="">Selecione o jogador</option>
+              </select>
+              <button
+                class="pushy__btn pushy__btn--md pushy__btn--green"
+                onclick="scoreGoal('A')"
+              >
+                <i class="fa-solid fa-futbol"></i> Marcar gol
+              </button>
+              <!-- <button class="btn btn-primary" onclick="scoreGoal('A')">
+                <i class="fa-solid fa-circle-up"></i> Marcar gol
+              </button> -->
+            </div>
+            <div class="col-12 col-md-6 team-box">
+              <h4>Time B</h4>
+              <ul id="teamB" class="list-group mb-2"></ul>
+              <select id="scorerB" class="form-select mb-2">
+                <option value="">Selecione o jogador</option>
+              </select>
+              <button
+                class="pushy__btn pushy__btn--md pushy__btn--green"
+                onclick="scoreGoal('B')"
+              >
+                <i class="fa-solid fa-futbol"></i> Marcar gol
+              </button>
+              <!-- <button class="btn btn-primary" onclick="scoreGoal('B')">
+                <i class="fa-solid fa-circle-up"></i> Marcar gol
+              </button> -->
+            </div>
+          </div>
+          <div class="mt-3">
+            <h4>Times na Próxima</h4>
+            <div id="nextTeams" class="next-teams"></div>
+          </div>
+          <div class="mt-3">
+            <h4>Times Sorteados</h4>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Time 1</th>
+                  <th>Time 2</th>
+                  <th>Próximas</th>
+                </tr>
+              </thead>
+              <tbody id="sortedTeams"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="stats" class="section d-none">
+          <h2>Estatísticas Gerais</h2>
+          <div id="generalStats"></div>
+          <button class="btn btn-secondary" onclick="showSection('start')">
+            Voltar
+          </button>
+        </div>
+
+        <div
+          class="modal fade"
+          id="endMatchModal"
+          tabindex="-1"
+          aria-labelledby="endMatchModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="endMatchModalLabel">
+                  Fim da Partida
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body" id="matchResult"></div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  <i class="fa-solid fa-xmark"></i> Fechar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="modal fade"
+          id="addPlayerModal"
+          tabindex="-1"
+          aria-labelledby="addPlayerModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="addPlayerModalLabel">
+                  Adicionar Jogador
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <input
+                  type="text"
+                  id="newPlayerName"
+                  class="form-control"
+                  placeholder="Nome do jogador"
+                />
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="pushy__btn pushy__btn--md pushy__btn--blue"
+                  onclick="addPlayerDuringMatch()"
+                >
+                  <i class="fas fa-plus me-1"></i> Adicionar jogador
+                </button>
+                <!-- <button
+                  type="button"
+                  class="btn btn-success"
+                  onclick="addPlayerDuringMatch()"
+                >
+                  Adicionar
+                </button> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </main>
+    <!--
+    <footer class="bg-dark text-white text-center py-3 fs-6 fs-sm-5 fs-md-4 fixed-bottom" style="font-size: 0.8rem!important;">
+    Fut de Quarta <span id="copyright"></span>. Desenvolvido por @moraiscode
+        <script>
+            document.getElementById('copyright').textContent = `© ${new Date().getFullYear()}`;
+        </script>
+    </footer> -->
+  </body>
+</html>
