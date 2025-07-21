@@ -4,14 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fut de Quarta</title>
+    <!--
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
-    />
+    /> -->
+    
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/bootstrap.css" />
+    
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
     />
+    <!--
+    <link rel="stylesheet" href="css/fontawesome.min.css" />
+    <link rel="stylesheet" href="css/all.min.css" /> -->
+    
     <link rel="stylesheet" href="css/pushy-buttons.min.css" />
     <link rel="stylesheet" href="css/style.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
@@ -31,7 +40,7 @@
       name="keywords"
       content="futebol, pelada, fut de quarta, sorteio de times, controle de jogo, estatísticas futebol, time de futebol, partida amadora"
     />
-    <meta name="author" content="Fut de Quarta" />
+    <meta name="author" content="Felipe Morais @moraiscode" />
     <meta name="robots" content="index, follow" />
 
     <!-- Open Graph / Facebook -->
@@ -88,8 +97,8 @@
         <!-- Links à direita -->
         <ul class="navbar-nav d-flex flex-row">
           <li class="nav-item me-3">
-            <a class="nav-link" href="ranking" target="_blank"
-              ><i class="fa-solid fa-trophy"></i> Ranking</a
+            <a class="nav-link" href="ranking/" target="_blank"
+              ><i class="fa-solid fa-trophy"></i> Ranking Geral</a
             >
           </li>
           <!-- <li class="nav-item">
@@ -108,8 +117,7 @@
             style="font-size: 0.8rem !important; padding: 5px; margin-top: 5%"
           >
             Para pesquisar um jogador já cadastrado, digite a primeira letra do
-            nome. Caso contrário Digite o nome do jogador e clique para
-            adicionar:
+            nome. Caso contrário Digite o nome do jogador e clique em Adicionar:
           </p>
 
           <div
@@ -136,7 +144,7 @@
               <i class="fa-solid fa-plus"></i> Adicionar jogador
             </button>
           </div>
-<hr/ style="width: 50%; margin: 0 auto; border-top: 1px solid #a2a2a2; margin-bottom: 8%;">
+
           <button
             class="pushable"
             onclick="sortTeams()"
