@@ -10,6 +10,7 @@ $(document).ready(function() {
             },
             success: function(data) {
                 $("#rankingTable").removeClass("loading");
+                console.log("Resposta do servidor:", data); // Depuração
                 if (!data.success) {
                     console.error("Erro ao carregar ranking:", data.error);
                     alert("Erro: " + data.error);

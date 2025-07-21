@@ -70,10 +70,11 @@ try {
         $prevStart = date('Y-m-d 00:00:00', strtotime('monday last week'));    // 2025-07-14 00:00:00
         $prevEnd = date('Y-m-d 23:59:59', strtotime('sunday last week'));      // 2025-07-20 23:59:59
 
-        // Obter ranking atual contando os registros diretamente
+        // Obter ranking atual
         $stmt = $pdo->prepare("SELECT p.name, COALESCE(COUNT(g1.id), 0) as current_goal_count, MAX(g1.goal_datetime) as current_last_goal
                               FROM players p
-                              LEFT JOIN goals g1 ON p.name = g1.player_name AND g1.goal_datetime BETWEEN ? AND ?
+                              LEFT JOIN goals g1 ON p.name = g1.player_name
+                              WHERE (g1.goal_datetime BETWEEN ? AND ? OR g1.goal_datetime IS NULL)
                               GROUP BY p.name
                               ORDER BY current_goal_count DESC, current_last_goal DESC
                               LIMIT 30");
@@ -83,12 +84,13 @@ try {
         // Obter ranking da semana anterior (para calcular o total de jogadores)
         $stmt = $pdo->prepare("SELECT p.name, COALESCE(COUNT(g2.id), 0) as prev_goal_count, MAX(g2.goal_datetime) as prev_last_goal
                               FROM players p
-                              LEFT JOIN goals g2 ON p.name = g2.player_name AND g2.goal_datetime BETWEEN ? AND ?
+                              LEFT JOIN goals g2 ON p.name = g2.player_name
+                              WHERE (g2.goal_datetime BETWEEN ? AND ? OR g2.goal_datetime IS NULL)
                               GROUP BY p.name
                               ORDER BY prev_goal_count DESC, prev_last_goal DESC");
         $stmt->execute([$prevStart, $prevEnd]);
         $prevRankingData = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $totalPlayersPrev = count(array_filter($prevRankingData, fn($row) => $row['prev_goal_count'] > 0));
+        $totalPlayersPrev = count(array_filter($prevRankingData, fn($row) => $row['prev_goal_count'] > 0)); // Total de jogadores com gols
         $prevRanking = [];
         foreach ($prevRankingData as $index => $row) {
             if ($row['prev_goal_count'] > 0) {
