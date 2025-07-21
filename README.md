@@ -1,3 +1,5 @@
+![Screenshot](design/thumb.png)
+
 # Fut de Quarta - Documentação do Sistema
 
 ## Descrição do Sistema
