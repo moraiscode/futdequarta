@@ -20,6 +20,64 @@ header('Content-Type: text/html; charset=utf-8');
     margin-bottom: 10%;
 }
     </style>
+
+    <!-- ###################### -->
+
+    <!-- SEO -->
+    <meta
+      name="description"
+      content="Gerencie partidas de futebol casuais com sorteio de times, controle de gols, substituições e estatísticas. Ideal para peladas semanais."
+    />
+    <meta
+      name="keywords"
+      content="futebol, pelada, fut de quarta, sorteio de times, controle de jogo, estatísticas futebol, time de futebol, partida amadora"
+    />
+    <meta name="author" content="Fut de Quarta" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph / Facebook -->
+    <meta
+      property="og:title"
+      content="Fut de Quarta – Gerenciador de Partidas de Futebol"
+    />
+    <meta
+      property="og:description"
+      content="Organize sua pelada semanal com sorteios, controle de tempo, gols e estatísticas. Interface amigável e dinâmica."
+    />
+    <meta property="og:image" content="../otg.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://futdequarta.moraiscode.com/" />
+    <!-- substitua pelo domínio real -->
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Fut de Quarta – Gerenciador de Partidas de Futebol"
+    />
+    <meta
+      name="twitter:description"
+      content="Sorteio de times, placar, rotação e estatísticas para futebol recreativo."
+    />
+    <meta name="twitter:image" content="../otg.png" />
+
+    <!-- FAVICON -->
+    <link
+      rel="icon"
+      type="image/png"
+      href="../favicon/favicon-96x96.png"
+      sizes="96x96"
+    />
+    <link rel="icon" type="image/svg+xml" href="favicon/favicon.svg" />
+    <link rel="shortcut icon" href="../favicon/favicon.ico" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="../favicon/apple-touch-icon.png"
+    />
+    <meta name="apple-mobile-web-app-title" content="FutdeQuarta" />
+    <link rel="manifest" href="../favicon/site.webmanifest" />
+
 </head>
 <body>
     <div class="container mt-5">
