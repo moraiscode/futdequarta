@@ -17,9 +17,11 @@ try {
         $query = isset($_GET['name']) ? trim($_GET['name']) : '';
         $players = [];
         if (!empty($query)) {
+            file_put_contents('debug.log', "Query: $query\n", FILE_APPEND);
             $stmt = $pdo->prepare("SELECT name FROM players WHERE name LIKE ? COLLATE utf8mb4_0900_ai_ci LIMIT 10");
             $stmt->execute([$query . '%']);
             $players = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            file_put_contents('debug.log', "Partial matches: " . implode(', ', $players) . "\n", FILE_APPEND);
         }
         echo json_encode(['players' => $players, 'count' => count($players)]);
     } elseif ($action === 'add') {
@@ -54,43 +56,41 @@ try {
         $stmt->execute([$name, $datetime]);
         echo json_encode(['success' => true]);
     } elseif ($action === 'getRanking') {
-        // Criar índices (executar uma vez, se não existirem)
-        $pdo->exec("CREATE INDEX idx_goals_player_name ON goals (player_name)");
-        $pdo->exec("CREATE INDEX idx_ranking_history_created_at ON ranking_history (created_at)");
-
-        // Obter ranking atual com uma única consulta otimizada
-        $stmt = $pdo->prepare("SELECT c.name, c.goal_count, c.last_goal,
-                              COALESCE(p.position, 0) as prev_position
-                              FROM (
-                                  SELECT p.name, COUNT(g.id) as goal_count, MAX(g.goal_datetime) as last_goal
-                                  FROM players p
-                                  LEFT JOIN goals g ON p.name = g.player_name
-                                  GROUP BY p.name
-                              ) c
-                              LEFT JOIN (
-                                  SELECT player_name, position
-                                  FROM ranking_history
-                                  ORDER BY created_at DESC
-                                  LIMIT 1
-                              ) p ON c.name = p.player_name
-                              ORDER BY c.goal_count DESC, c.last_goal DESC
-                              LIMIT 30");
+        // Salvar o ranking atual como histórico antes de calcular o novo
+        $stmt = $pdo->prepare("SELECT p.name, COUNT(g.id) as goal_count, MAX(g.goal_datetime) as last_goal
+                              FROM players p
+                              LEFT JOIN goals g ON p.name = g.player_name
+                              GROUP BY p.name
+                              ORDER BY goal_count DESC, last_goal DESC");
         $stmt->execute();
         $currentRanking = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Salvar o ranking atual no histórico (assíncrono ou em batch, aqui simplificado)
+        // Salvar o ranking atual no histórico
         $pdo->beginTransaction();
-        $stmt = $pdo->prepare("INSERT INTO ranking_history (player_name, position, goal_count, last_goal) VALUES (?, ?, ?, ?)
-                              ON DUPLICATE KEY UPDATE position = VALUES(position), goal_count = VALUES(goal_count), last_goal = VALUES(last_goal)");
+        $stmt = $pdo->prepare("INSERT INTO ranking_history (player_name, position, goal_count, last_goal) VALUES (?, ?, ?, ?)");
         foreach ($currentRanking as $index => $player) {
             $stmt->execute([$player['name'], $index + 1, $player['goal_count'], $player['last_goal']]);
         }
         $pdo->commit();
 
+        // Obter o ranking anterior do histórico (último registro)
+        $stmt = $pdo->query("SELECT player_name, position, goal_count, last_goal
+                            FROM ranking_history
+                            ORDER BY created_at DESC
+                            LIMIT 1");
+        $previousRanking = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
         // Calcular variação e evolução
         $rankingWithVariation = [];
         foreach ($currentRanking as $index => $player) {
-            $variation = $player['prev_position'] ? $player['prev_position'] - ($index + 1) : 0;
+            $prevPosition = null;
+            foreach ($previousRanking as $prev) {
+                if ($prev['player_name'] === $player['name']) {
+                    $prevPosition = $prev['position'];
+                    break;
+                }
+            }
+            $variation = $prevPosition ? $prevPosition - ($index + 1) : 0;
             $evolution = $variation > 0 ? 'up' : ($variation < 0 ? 'down' : 'equal');
             $rankingWithVariation[] = array_merge($player, ['variation' => $variation, 'evolution' => $evolution]);
         }
