@@ -143,7 +143,7 @@
             >
               <i class="fa-solid fa-plus"></i> Adicionar jogador
             </button>
-          </div>
+          </div>          
 
           <button
             class="pushable"
@@ -153,6 +153,7 @@
             <span class="front">
               <i class="fa-solid fa-shuffle"></i> Sortear times
             </span>
+
           </button>
         </div>
 
@@ -178,6 +179,8 @@
             >
               <i class="fa-solid fa-person-walking"></i> Iniciar partida
             </button>
+
+            <button id="pauseMatch" class="btn btn-light w-100" onclick="togglePause()"><i class="fa-solid fa-pause"></i> Pausar Partida</button>
 
             <!-- <button class="btn btn-primary me-2" onclick="startMatch()">
               <i class="fa-solid fa-person-walking"></i>Iniciar partida
@@ -263,10 +266,11 @@
               <tbody id="sortedTeams"></tbody>
             </table>
           </div>
+          
         </div>
 
         <div id="stats" class="section d-none">
-          <h2>Estatísticas Gerais</h2>
+          <!-- <h2>Estatísticas Gerais</h2> -->
           <div id="generalStats"></div>
           <button class="btn btn-secondary" onclick="showSection('start')">
             Voltar
@@ -365,5 +369,11 @@
             document.getElementById('copyright').textContent = `© ${new Date().getFullYear()}`;
         </script>
     </footer> -->
+    <script>
+      window.addEventListener('beforeunload', function (e) {
+  e.preventDefault(); // necessário em alguns navegadores
+  e.returnValue = ''; // necessário para que o alerta seja exibido
+});
+    </script>
   </body>
 </html>

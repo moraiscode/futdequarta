@@ -580,6 +580,35 @@ function startMatch() {
     updateTimerDisplay();
     if (timer <= 0) endMatch();
   }, 1000);
+  window.timerRunning = true;
+}
+
+function pauseTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    window.timerRunning = false;
+  }
+}
+
+function startTimer() {
+  if (!timerInterval) {
+    timerInterval = setInterval(() => {
+      timer--;
+      updateTimerDisplay();
+      if (timer <= 0) endMatch();
+    }, 1000);
+    window.timerRunning = true;
+  }
+}
+
+function togglePause() {
+  if (window.timerRunning) {
+    pauseTimer();
+  } else {
+    startTimer();
+  }
+  saveState();
 }
 
 function updateTimerDisplay() {
