@@ -97,6 +97,11 @@
         <!-- Links à direita -->
         <ul class="navbar-nav d-flex flex-row">
           <li class="nav-item me-3">
+            <a class="nav-link text-secondary" href="#" onclick="showSection('start')"
+              >v1.5.2</a
+            >
+          </li>
+          <li class="nav-item me-3">
             <a class="nav-link" href="ranking/" target="_blank"
               ><i class="fa-solid fa-trophy"></i> Ranking Geral</a
             >
@@ -160,6 +165,10 @@
         <div id="game" class="section d-none">
           <!-- <h2>Partida Atual</h2> -->
           <h3 id="timer">10:00</h3>
+          <div class="mb-3 d-flex justify-content-center">
+            <button class="btn btn-outline-dark btn-sm me-2" onclick="setTimerTo10()"><i class="fa-solid fa-angles-right"></i> 10 min</button>
+            <button class="btn btn-outline-dark btn-sm" onclick="setTimerTo8()"><i class="fa-solid fa-angles-left"></i> 8 min</button>
+          </div>
           <div class="progress" style="height: 5px">
             <div
               id="timerProgress"
@@ -180,7 +189,7 @@
               <i class="fa-solid fa-person-walking"></i> Iniciar partida
             </button>
 
-            <button id="pauseMatch" class="btn btn-light w-100" onclick="togglePause()"><i class="fa-solid fa-pause"></i> Pausar Partida</button>
+            <button id="pauseMatch" class="btn btn-outline-dark w-100" onclick="togglePause()"><i class="fa-solid fa-play"></i><i class="fa-solid fa-pause"></i> Pausar/Retomar Partida</button>
 
             <!-- <button class="btn btn-primary me-2" onclick="startMatch()">
               <i class="fa-solid fa-person-walking"></i>Iniciar partida
@@ -220,7 +229,7 @@
               <h4>Time A</h4>
               <ul id="teamA" class="list-group mb-2"></ul>
               <select id="scorerA" class="form-select mb-2">
-                <option value="">Selecione o jogador</option>
+                <option value="">Selecione o jogador que fez o gol</option>
               </select>
               <button
                 class="pushy__btn pushy__btn--md pushy__btn--green"
@@ -236,7 +245,7 @@
               <h4>Time B</h4>
               <ul id="teamB" class="list-group mb-2"></ul>
               <select id="scorerB" class="form-select mb-2">
-                <option value="">Selecione o jogador</option>
+                <option value="">Selecione o jogador que fez o gol</option>
               </select>
               <button
                 class="pushy__btn pushy__btn--md pushy__btn--green"
@@ -286,7 +295,7 @@
         >
           <div class="modal-dialog">
             <div class="modal-content">
-              <div class="modal-header">
+              <!-- <div class="modal-header">
                 <h5 class="modal-title" id="endMatchModalLabel">
                   Fim da Partida
                 </h5>
@@ -296,7 +305,7 @@
                   data-bs-dismiss="modal"
                   aria-label="Close"
                 ></button>
-              </div>
+              </div> -->
               <div class="modal-body" id="matchResult"></div>
               <div class="modal-footer">
                 <button

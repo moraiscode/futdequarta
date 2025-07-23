@@ -81,9 +81,9 @@ header('Content-Type: text/html; charset=utf-8');
 </head>
 <body>
     <div class="container mt-5">
-        <img src="../design/logo_minimal.png" alt="" class="img-fluid mb-4 d-block mx-auto">
+        <img src="../design/logo_minimal.png" alt="" class="img-fluid mb-4 d-block mx-auto"> 
         <!-- <h1 class="text-center mb-4">Ranking Geral</h1> -->
-        <p class="text-center mb-4">Confira o ranking dos jogadores com mais gols no somatório geral (desde 2025)</p>
+        <p class="text-center mb-4 text-secondary">Confira o ranking dos jogadores com mais gols no somatório geral (desde 2025). Neste ranking, só os 30 primeiros.</p>
         
         <table id="rankingTable" class="table table-striped table-bordered loading" style="width:100%">
             <thead>

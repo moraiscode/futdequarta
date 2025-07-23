@@ -133,8 +133,8 @@ function updateTeamsDisplay() {
 
   teamAList.innerHTML = "";
   teamBList.innerHTML = "";
-  scorerA.innerHTML = '<option value="">Selecione o jogador</option>';
-  scorerB.innerHTML = '<option value="">Selecione o jogador</option>';
+  scorerA.innerHTML = '<option value="">Selecione o jogador que fez o gol</option>';
+  scorerB.innerHTML = '<option value="">Selecione o jogador que fez o gol</option>';
   nextTeamsDiv.innerHTML = "";
   sortedTeams.innerHTML = "";
 
@@ -156,7 +156,7 @@ function updateTeamsDisplay() {
     li.appendChild(playerSpan);
     const substituteBtn = document.createElement("span");
     substituteBtn.className = "substitute-btn";
-    substituteBtn.textContent = "⮂";
+    substituteBtn.innerHTML = '<i class="fas fa-exchange-alt"></i>';
     substituteBtn.onclick = () => toggleSubstituteDropdown(li);
     li.appendChild(substituteBtn);
     const deleteBtn = document.createElement("span");
@@ -206,7 +206,7 @@ function updateTeamsDisplay() {
     li.appendChild(playerSpan);
     const substituteBtn = document.createElement("span");
     substituteBtn.className = "substitute-btn";
-    substituteBtn.textContent = "⮂";
+    substituteBtn.innerHTML = '<i class="fas fa-exchange-alt"></i>';
     substituteBtn.onclick = () => toggleSubstituteDropdown(li);
     li.appendChild(substituteBtn);
     const deleteBtn = document.createElement("span");
@@ -259,7 +259,7 @@ function updateTeamsDisplay() {
       li.appendChild(playerSpan);
       const substituteBtn = document.createElement("span");
       substituteBtn.className = "substitute-btn";
-      substituteBtn.textContent = "⮂";
+      substituteBtn.innerHTML = '<i class="fas fa-exchange-alt"></i>';
       substituteBtn.onclick = () => toggleSubstituteDropdown(li);
       li.appendChild(substituteBtn);
       const deleteBtn = document.createElement("span");
@@ -725,10 +725,10 @@ function endMatch() {
           .join("")}</ul>`
       : "<p>Nenhum gol marcado.</p>";
   document.getElementById("matchResult").innerHTML = `
-                Placar: Time A ${scoreA} x ${scoreB} Time B<br>
-                <br/><div class="alert alert-info">Vencedor: Time ${lastWinner}</div><br/>
-                <br/>Time A: ${teamA.join(", ")}<br>
-                Time B: ${teamB.join(", ")}<br>
+                <strong class="text-primary fs-5">Vencedor: Time ${lastWinner}</strong><br/>
+                <br/>Placar: Time A ${scoreA} x ${scoreB} Time B<br/>
+                <br/>Time A: ${teamA.join(", ")}<br/>
+                Time B: ${teamB.join(", ")}<br/>
                 ${scorersList}
             `;
   const audio = new Audio("aviso.mp3");
@@ -810,4 +810,16 @@ function endDay() {
                 }</p>
             `;
   showSection("stats");
+}
+
+function setTimerTo10() {
+    window.timer = 600; // 10 minutos
+    updateTimerDisplay();
+    saveState();
+}
+
+function setTimerTo8() {
+    window.timer = 480; // 8 minutos
+    updateTimerDisplay();
+    saveState();
 }
