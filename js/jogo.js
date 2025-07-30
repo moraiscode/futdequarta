@@ -1,4 +1,3 @@
-// Defina as variáveis globais no escopo da janela
 window.players = window.players || [];
 window.teamA = window.teamA || [];
 window.teamB = window.teamB || [];
@@ -108,20 +107,21 @@ function sortTeams() {
     return;
   }
   const shuffled = shuffleArray([...window.players]);
-  console.log("Shuffled players:", shuffled); // Depuração
-  window.teamA = shuffled.slice(0, 5);
-  window.teamB = shuffled.slice(5, 10);
+  console.log("Shuffled players:", shuffled);
+  window.teamA = shuffled.slice(0, 5); // Time A com 5 jogadores (1 goleiro + 4)
+  window.teamB = shuffled.slice(5, 10); // Time B com 5 jogadores (1 goleiro + 4)
   window.nextTeams = [];
-  for (let i = 10; i < shuffled.length; i += 5) {
-    window.nextTeams.push(shuffled.slice(i, i + 5));
+  for (let i = 10; i < shuffled.length; i += 4) { // Próximas com 4 jogadores cada
+    const nextTeam = shuffled.slice(i, i + 4);
+    if (nextTeam.length > 0) { // Só adiciona times não vazios
+      window.nextTeams.push(nextTeam);
+    }
   }
   window.goalScorers = [];
   updateTeamsDisplay();
   showSection("game");
-  saveState(); // Garante que o estado seja salvo após o sorteio
+  saveState();
 }
-
-// ... (mantém as demais funções como updateTeamsDisplay, substitutePlayer, deletePlayer, etc., ajustando para usar window.teamA, window.teamB, etc.)
 
 function updateTeamsDisplay() {
   const teamAList = document.getElementById("teamA");
@@ -139,20 +139,25 @@ function updateTeamsDisplay() {
   sortedTeams.innerHTML = "";
 
   console.log("Updating teams display:", {
-    teamA: [...teamA],
-    teamB: [...teamB],
-    nextTeams: JSON.stringify(nextTeams),
+    teamA: [...window.teamA],
+    teamB: [...window.teamB],
+    nextTeams: JSON.stringify(window.nextTeams),
   });
 
-  teamA.forEach((player) => {
+  window.teamA.forEach((player, index) => {
     const li = document.createElement("li");
     li.className = "list-group-item player-item";
     li.setAttribute("data-player", player);
-    if (goalScorers.includes(player)) {
-      li.classList.add("scorer");
+    if (window.goalScorers.includes(player)) {
+        li.classList.add("scorer");
     }
     const playerSpan = document.createElement("span");
-    playerSpan.textContent = player;
+    if (index === 0) {
+        li.style.fontWeight = "bold"; // Goleiro em negrito
+        playerSpan.innerHTML = `<i class="fa-solid fa-hand"></i> ${player} (Goleiro)`;
+    } else {
+        playerSpan.textContent = player;
+    }
     li.appendChild(playerSpan);
     const substituteBtn = document.createElement("span");
     substituteBtn.className = "substitute-btn";
@@ -163,28 +168,28 @@ function updateTeamsDisplay() {
     deleteBtn.className = "delete-btn";
     deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
     deleteBtn.onclick = (event) => {
-      event.stopPropagation();
-      const playerName = li.getAttribute("data-player");
-      console.log(
-        `Delete button clicked for player: ${playerName}, teamId: teamA`
-      );
-      deletePlayer(playerName, "teamA");
+        event.stopPropagation();
+        const playerName = li.getAttribute("data-player");
+        console.log(
+            `Delete button clicked for player: ${playerName}, teamId: teamA`
+        );
+        deletePlayer(playerName, "teamA");
     };
     li.appendChild(deleteBtn);
     const dropdown = document.createElement("select");
     dropdown.className = "substitute-dropdown form-select form-select-sm";
     dropdown.innerHTML = '<option value="">Selecione o substituto</option>';
-    players
-      .filter((p) => p !== player)
-      .forEach((p) => {
-        const option = document.createElement("option");
-        option.value = p;
-        option.textContent = p;
-        dropdown.appendChild(option);
-      });
+    window.players
+        .filter((p) => p !== player)
+        .forEach((p) => {
+            const option = document.createElement("option");
+            option.value = p;
+            option.textContent = p;
+            dropdown.appendChild(option);
+        });
     dropdown.onchange = () => {
-      const playerName = li.getAttribute("data-player");
-      substitutePlayer(playerName, dropdown.value, "teamA");
+        const playerName = li.getAttribute("data-player");
+        substitutePlayer(playerName, dropdown.value, "teamA");
     };
     li.appendChild(dropdown);
     teamAList.appendChild(li);
@@ -192,17 +197,22 @@ function updateTeamsDisplay() {
     scorerOption.value = player;
     scorerOption.textContent = player;
     scorerA.appendChild(scorerOption);
-  });
+});
 
-  teamB.forEach((player) => {
+window.teamB.forEach((player, index) => {
     const li = document.createElement("li");
     li.className = "list-group-item player-item";
     li.setAttribute("data-player", player);
-    if (goalScorers.includes(player)) {
-      li.classList.add("scorer");
+    if (window.goalScorers.includes(player)) {
+        li.classList.add("scorer");
     }
     const playerSpan = document.createElement("span");
-    playerSpan.textContent = player;
+    if (index === 0) {
+        li.style.fontWeight = "bold"; // Goleiro em negrito
+        playerSpan.innerHTML = `<i class="fa-solid fa-hand"></i> ${player} (Goleiro)`;
+    } else {
+        playerSpan.textContent = player;
+    }
     li.appendChild(playerSpan);
     const substituteBtn = document.createElement("span");
     substituteBtn.className = "substitute-btn";
@@ -213,28 +223,28 @@ function updateTeamsDisplay() {
     deleteBtn.className = "delete-btn";
     deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
     deleteBtn.onclick = (event) => {
-      event.stopPropagation();
-      const playerName = li.getAttribute("data-player");
-      console.log(
-        `Delete button clicked for player: ${playerName}, teamId: teamB`
-      );
-      deletePlayer(playerName, "teamB");
+        event.stopPropagation();
+        const playerName = li.getAttribute("data-player");
+        console.log(
+            `Delete button clicked for player: ${playerName}, teamId: teamB`
+        );
+        deletePlayer(playerName, "teamB");
     };
     li.appendChild(deleteBtn);
     const dropdown = document.createElement("select");
     dropdown.className = "substitute-dropdown form-select form-select-sm";
     dropdown.innerHTML = '<option value="">Selecione o substituto</option>';
-    players
-      .filter((p) => p !== player)
-      .forEach((p) => {
-        const option = document.createElement("option");
-        option.value = p;
-        option.textContent = p;
-        dropdown.appendChild(option);
-      });
+    window.players
+        .filter((p) => p !== player)
+        .forEach((p) => {
+            const option = document.createElement("option");
+            option.value = p;
+            option.textContent = p;
+            dropdown.appendChild(option);
+        });
     dropdown.onchange = () => {
-      const playerName = li.getAttribute("data-player");
-      substitutePlayer(playerName, dropdown.value, "teamB");
+        const playerName = li.getAttribute("data-player");
+        substitutePlayer(playerName, dropdown.value, "teamB");
     };
     li.appendChild(dropdown);
     teamBList.appendChild(li);
@@ -242,9 +252,9 @@ function updateTeamsDisplay() {
     scorerOption.value = player;
     scorerOption.textContent = player;
     scorerB.appendChild(scorerOption);
-  });
+});
 
-  nextTeams.forEach((team, index) => {
+  window.nextTeams.forEach((team, index) => {
     const teamDiv = document.createElement("div");
     teamDiv.className = "team-box";
     teamDiv.innerHTML = `<h5>Próximo Time ${index + 1}</h5>`;
@@ -271,14 +281,14 @@ function updateTeamsDisplay() {
         console.log(
           `Delete button clicked for player: ${playerName}, teamId: nextTeam${index}`
         );
-        console.log("NextTeams before deletion:", JSON.stringify(nextTeams));
+        console.log("NextTeams before deletion:", JSON.stringify(window.nextTeams));
         deletePlayer(playerName, `nextTeam${index}`);
       };
       li.appendChild(deleteBtn);
       const dropdown = document.createElement("select");
       dropdown.className = "substitute-dropdown form-select form-select-sm";
       dropdown.innerHTML = '<option value="">Selecione o substituto</option>';
-      players
+      window.players
         .filter((p) => p !== player)
         .forEach((p) => {
           const option = document.createElement("option");
@@ -307,9 +317,9 @@ function updateTeamsDisplay() {
 
   const tr = document.createElement("tr");
   tr.innerHTML = `
-                <td>${teamA.join(", ")}</td>
-                <td>${teamB.join(", ")}</td>
-                <td>${nextTeams.map((team) => team.join(", ")).join("; ")}</td>
+                <td>${window.teamA.join(", ")}</td>
+                <td>${window.teamB.join(", ")}</td>
+                <td>${window.nextTeams.map((team) => team.join(", ")).join("; ")}</td>
             `;
   sortedTeams.appendChild(tr);
 }
@@ -334,34 +344,34 @@ function substitutePlayer(currentPlayer, newPlayer, teamId) {
   }
   console.log(`Substituting ${currentPlayer} with ${newPlayer} in ${teamId}`);
   console.log("Before substitution:", {
-    teamA: [...teamA],
-    teamB: [...teamB],
-    nextTeams: JSON.stringify(nextTeams),
+    teamA: [...window.teamA],
+    teamB: [...window.teamB],
+    nextTeams: JSON.stringify(window.nextTeams),
   });
 
-  updateTeamsDisplay(); // Sincronizar DOM antes da substituição
+  updateTeamsDisplay();
 
   const normalizedCurrentPlayer = currentPlayer.trim();
   const normalizedNewPlayer = newPlayer.trim();
 
   if (teamId === "teamA") {
-    const index = teamA.indexOf(normalizedCurrentPlayer);
+    const index = window.teamA.indexOf(normalizedCurrentPlayer);
     if (index === -1) {
       console.error(`Player ${normalizedCurrentPlayer} not found in teamA`);
-      console.log(`Available players in teamA: ${JSON.stringify(teamA)}`);
+      console.log(`Available players in teamA: ${JSON.stringify(window.teamA)}`);
       return;
     }
-    if (teamB.includes(normalizedNewPlayer)) {
-      const newIndex = teamB.indexOf(normalizedNewPlayer);
-      teamA[index] = normalizedNewPlayer;
-      teamB[newIndex] = normalizedCurrentPlayer;
-    } else if (nextTeams.flat().includes(normalizedNewPlayer)) {
+    if (window.teamB.includes(normalizedNewPlayer)) {
+      const newIndex = window.teamB.indexOf(normalizedNewPlayer);
+      window.teamA[index] = normalizedNewPlayer;
+      window.teamB[newIndex] = normalizedCurrentPlayer;
+    } else if (window.nextTeams.flat().includes(normalizedNewPlayer)) {
       let found = false;
-      for (let i = 0; i < nextTeams.length; i++) {
-        const newIndex = nextTeams[i].indexOf(normalizedNewPlayer);
+      for (let i = 0; i < window.nextTeams.length; i++) {
+        const newIndex = window.nextTeams[i].indexOf(normalizedNewPlayer);
         if (newIndex !== -1) {
-          nextTeams[i][newIndex] = normalizedCurrentPlayer;
-          teamA[index] = normalizedNewPlayer;
+          window.nextTeams[i][newIndex] = normalizedCurrentPlayer;
+          window.teamA[index] = normalizedNewPlayer;
           found = true;
           break;
         }
@@ -369,33 +379,33 @@ function substitutePlayer(currentPlayer, newPlayer, teamId) {
       if (!found) {
         console.error(`Player ${normalizedNewPlayer} not found in nextTeams`);
         console.log(
-          `All nextTeams players: ${JSON.stringify(nextTeams.flat())}`
+          `All nextTeams players: ${JSON.stringify(window.nextTeams.flat())}`
         );
         return;
       }
     } else {
       console.error(`Player ${normalizedNewPlayer} not found in any team`);
-      console.log(`All players: ${JSON.stringify(players)}`);
+      console.log(`All players: ${JSON.stringify(window.players)}`);
       return;
     }
   } else if (teamId === "teamB") {
-    const index = teamB.indexOf(normalizedCurrentPlayer);
+    const index = window.teamB.indexOf(normalizedCurrentPlayer);
     if (index === -1) {
       console.error(`Player ${normalizedCurrentPlayer} not found in teamB`);
-      console.log(`Available players in teamB: ${JSON.stringify(teamB)}`);
+      console.log(`Available players in teamB: ${JSON.stringify(window.teamB)}`);
       return;
     }
-    if (teamA.includes(normalizedNewPlayer)) {
-      const newIndex = teamA.indexOf(normalizedNewPlayer);
-      teamB[index] = normalizedNewPlayer;
-      teamA[newIndex] = normalizedCurrentPlayer;
-    } else if (nextTeams.flat().includes(normalizedNewPlayer)) {
+    if (window.teamA.includes(normalizedNewPlayer)) {
+      const newIndex = window.teamA.indexOf(normalizedNewPlayer);
+      window.teamB[index] = normalizedNewPlayer;
+      window.teamA[newIndex] = normalizedCurrentPlayer;
+    } else if (window.nextTeams.flat().includes(normalizedNewPlayer)) {
       let found = false;
-      for (let i = 0; i < nextTeams.length; i++) {
-        const newIndex = nextTeams[i].indexOf(normalizedNewPlayer);
+      for (let i = 0; i < window.nextTeams.length; i++) {
+        const newIndex = window.nextTeams[i].indexOf(normalizedNewPlayer);
         if (newIndex !== -1) {
-          nextTeams[i][newIndex] = normalizedCurrentPlayer;
-          teamB[index] = normalizedNewPlayer;
+          window.nextTeams[i][newIndex] = normalizedCurrentPlayer;
+          window.teamB[index] = normalizedNewPlayer;
           found = true;
           break;
         }
@@ -403,61 +413,61 @@ function substitutePlayer(currentPlayer, newPlayer, teamId) {
       if (!found) {
         console.error(`Player ${normalizedNewPlayer} not found in nextTeams`);
         console.log(
-          `All nextTeams players: ${JSON.stringify(nextTeams.flat())}`
+          `All nextTeams players: ${JSON.stringify(window.nextTeams.flat())}`
         );
         return;
       }
     } else {
       console.error(`Player ${normalizedNewPlayer} not found in any team`);
-      console.log(`All players: ${JSON.stringify(players)}`);
+      console.log(`All players: ${JSON.stringify(window.players)}`);
       return;
     }
   } else if (teamId.startsWith("nextTeam")) {
     const teamIndex = parseInt(teamId.replace("nextTeam", ""), 10);
-    if (teamIndex >= nextTeams.length || teamIndex < 0) {
+    if (teamIndex >= window.nextTeams.length || teamIndex < 0) {
       console.error(`Invalid team index: ${teamIndex}`);
       return;
     }
-    const index = nextTeams[teamIndex].indexOf(normalizedCurrentPlayer);
+    const index = window.nextTeams[teamIndex].indexOf(normalizedCurrentPlayer);
     if (index === -1) {
       console.error(
         `Player ${normalizedCurrentPlayer} not found in nextTeam${teamIndex}`
       );
       console.log(
         `Available players in nextTeam${teamIndex}: ${JSON.stringify(
-          nextTeams[teamIndex]
+          window.nextTeams[teamIndex]
         )}`
       );
       return;
     }
-    if (teamA.includes(normalizedNewPlayer)) {
-      const newIndex = teamA.indexOf(normalizedNewPlayer);
-      nextTeams[teamIndex][index] = normalizedNewPlayer;
-      teamA[newIndex] = normalizedCurrentPlayer;
-    } else if (teamB.includes(normalizedNewPlayer)) {
-      const newIndex = teamB.indexOf(normalizedNewPlayer);
-      nextTeams[teamIndex][index] = normalizedNewPlayer;
-      teamB[newIndex] = normalizedCurrentPlayer;
-    } else if (nextTeams.flat().includes(normalizedNewPlayer)) {
-      for (let i = 0; i < nextTeams.length; i++) {
+    if (window.teamA.includes(normalizedNewPlayer)) {
+      const newIndex = window.teamA.indexOf(normalizedNewPlayer);
+      window.nextTeams[teamIndex][index] = normalizedNewPlayer;
+      window.teamA[newIndex] = normalizedCurrentPlayer;
+    } else if (window.teamB.includes(normalizedNewPlayer)) {
+      const newIndex = window.teamB.indexOf(normalizedNewPlayer);
+      window.nextTeams[teamIndex][index] = normalizedNewPlayer;
+      window.teamB[newIndex] = normalizedCurrentPlayer;
+    } else if (window.nextTeams.flat().includes(normalizedNewPlayer)) {
+      for (let i = 0; i < window.nextTeams.length; i++) {
         if (i === teamIndex) continue;
-        const newIndex = nextTeams[i].indexOf(normalizedNewPlayer);
+        const newIndex = window.nextTeams[i].indexOf(normalizedNewPlayer);
         if (newIndex !== -1) {
-          nextTeams[i][newIndex] = normalizedCurrentPlayer;
-          nextTeams[teamIndex][index] = normalizedNewPlayer;
+          window.nextTeams[i][newIndex] = normalizedCurrentPlayer;
+          window.nextTeams[teamIndex][index] = normalizedNewPlayer;
           break;
         }
       }
     } else {
       console.error(`Player ${normalizedNewPlayer} not found in any team`);
-      console.log(`All players: ${JSON.stringify(players)}`);
+      console.log(`All players: ${JSON.stringify(window.players)}`);
       return;
     }
   }
   console.log("After substitution:", {
-    teamA: [...teamA],
-    teamB: [...teamB],
-    nextTeams: JSON.stringify(nextTeams),
+    teamA: [...window.teamA],
+    teamB: [...window.teamB],
+    nextTeams: JSON.stringify(window.nextTeams),
   });
   updateTeamsDisplay();
 }
@@ -465,37 +475,37 @@ function substitutePlayer(currentPlayer, newPlayer, teamId) {
 function deletePlayer(player, teamId) {
   console.log(`Attempting to delete ${player} from ${teamId}`);
   console.log("Current state:", {
-    teamA: [...teamA],
-    teamB: [...teamB],
-    nextTeams: JSON.stringify(nextTeams),
-    players: [...players],
+    teamA: [...window.teamA],
+    teamB: [...window.teamB],
+    nextTeams: JSON.stringify(window.nextTeams),
+    players: [...window.players],
   });
 
   const normalizedPlayer = player.trim();
 
   if (teamId === "teamA") {
-    const index = teamA.indexOf(normalizedPlayer);
+    const index = window.teamA.indexOf(normalizedPlayer);
     if (index === -1) {
       console.error(`Player ${normalizedPlayer} not found in teamA`);
-      console.log(`Available players in teamA: ${JSON.stringify(teamA)}`);
+      console.log(`Available players in teamA: ${JSON.stringify(window.teamA)}`);
       return;
     }
     let replacementPlayer = null;
-    if (nextTeams.length > 0) {
-      const lastTeam = nextTeams[nextTeams.length - 1];
+    if (window.nextTeams.length > 0) {
+      const lastTeam = window.nextTeams[window.nextTeams.length - 1];
       if (lastTeam.length > 0) {
         replacementPlayer = lastTeam.pop();
         if (lastTeam.length === 0) {
-          nextTeams.pop();
+          window.nextTeams.pop();
         }
       }
     }
-    if (teamA.length > 1 || replacementPlayer) {
-      teamA.splice(index, 1);
+    if (window.teamA.length > 1 || replacementPlayer) {
+      window.teamA.splice(index, 1);
       if (replacementPlayer) {
-        teamA.push(replacementPlayer);
+        window.teamA.push(replacementPlayer);
       }
-      players = players.filter((p) => p !== normalizedPlayer);
+      window.players = window.players.filter((p) => p !== normalizedPlayer);
     } else {
       alert(
         "Não é possível remover o último jogador do Time A sem um substituto."
@@ -503,28 +513,28 @@ function deletePlayer(player, teamId) {
       return;
     }
   } else if (teamId === "teamB") {
-    const index = teamB.indexOf(normalizedPlayer);
+    const index = window.teamB.indexOf(normalizedPlayer);
     if (index === -1) {
       console.error(`Player ${normalizedPlayer} not found in teamB`);
-      console.log(`Available players in teamB: ${JSON.stringify(teamB)}`);
+      console.log(`Available players in teamB: ${JSON.stringify(window.teamB)}`);
       return;
     }
     let replacementPlayer = null;
-    if (nextTeams.length > 0) {
-      const lastTeam = nextTeams[nextTeams.length - 1];
+    if (window.nextTeams.length > 0) {
+      const lastTeam = window.nextTeams[window.nextTeams.length - 1];
       if (lastTeam.length > 0) {
         replacementPlayer = lastTeam.pop();
         if (lastTeam.length === 0) {
-          nextTeams.pop();
+          window.nextTeams.pop();
         }
       }
     }
-    if (teamB.length > 1 || replacementPlayer) {
-      teamB.splice(index, 1);
+    if (window.teamB.length > 1 || replacementPlayer) {
+      window.teamB.splice(index, 1);
       if (replacementPlayer) {
-        teamB.push(replacementPlayer);
+        window.teamB.push(replacementPlayer);
       }
-      players = players.filter((p) => p !== normalizedPlayer);
+      window.players = window.players.filter((p) => p !== normalizedPlayer);
     } else {
       alert(
         "Não é possível remover o último jogador do Time B sem um substituto."
@@ -533,70 +543,70 @@ function deletePlayer(player, teamId) {
     }
   } else if (teamId.startsWith("nextTeam")) {
     const teamIndex = parseInt(teamId.replace("nextTeam", ""), 10);
-    if (teamIndex >= nextTeams.length || teamIndex < 0) {
+    if (teamIndex >= window.nextTeams.length || teamIndex < 0) {
       console.error(`Invalid team index: ${teamIndex}`);
       return;
     }
-    const index = nextTeams[teamIndex].indexOf(normalizedPlayer);
+    const index = window.nextTeams[teamIndex].indexOf(normalizedPlayer);
     if (index === -1) {
       console.error(
         `Player ${normalizedPlayer} not found in nextTeam${teamIndex}`
       );
       console.log(
         `Available players in nextTeam${teamIndex}: ${JSON.stringify(
-          nextTeams[teamIndex]
+          window.nextTeams[teamIndex]
         )}`
       );
       return;
     }
-    nextTeams[teamIndex].splice(index, 1);
-    players = players.filter((p) => p !== normalizedPlayer);
-    if (nextTeams[teamIndex].length === 0) {
-      nextTeams.splice(teamIndex, 1);
+    window.nextTeams[teamIndex].splice(index, 1);
+    window.players = window.players.filter((p) => p !== normalizedPlayer);
+    if (window.nextTeams[teamIndex].length === 0) {
+      window.nextTeams.splice(teamIndex, 1);
     }
   } else {
     console.error(`Invalid teamId: ${teamId}`);
     return;
   }
   console.log("After deletion:", {
-    teamA: [...teamA],
-    teamB: [...teamB],
-    nextTeams: JSON.stringify(nextTeams),
-    players: [...players],
+    teamA: [...window.teamA],
+    teamB: [...window.teamB],
+    nextTeams: JSON.stringify(window.nextTeams),
+    players: [...window.players],
   });
   updateTeamsDisplay();
 }
 
 function startMatch() {
-  scoreA = 0;
-  scoreB = 0;
-  timer = 600;
-  goalScorers = [];
+  window.scoreA = 0;
+  window.scoreB = 0;
+  window.timer = 600;
+  window.goalScorers = [];
   updateTeamsDisplay();
   updateTimerDisplay();
-  if (timerInterval) clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    timer--;
+  if (window.timerInterval) clearInterval(window.timerInterval);
+  window.timerInterval = setInterval(() => {
+    window.timer--;
     updateTimerDisplay();
-    if (timer <= 0) endMatch();
+    if (window.timer <= 0) endMatch();
   }, 1000);
   window.timerRunning = true;
 }
 
 function pauseTimer() {
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
+  if (window.timerInterval) {
+    clearInterval(window.timerInterval);
+    window.timerInterval = null;
     window.timerRunning = false;
   }
 }
 
 function startTimer() {
-  if (!timerInterval) {
-    timerInterval = setInterval(() => {
-      timer--;
+  if (!window.timerInterval) {
+    window.timerInterval = setInterval(() => {
+      window.timer--;
       updateTimerDisplay();
-      if (timer <= 0) endMatch();
+      if (window.timer <= 0) endMatch();
     }, 1000);
     window.timerRunning = true;
   }
@@ -612,20 +622,20 @@ function togglePause() {
 }
 
 function updateTimerDisplay() {
-  const minutes = Math.floor(timer / 60);
-  const seconds = timer % 60;
+  const minutes = Math.floor(window.timer / 60);
+  const seconds = window.timer % 60;
   document.getElementById("timer").textContent = `${minutes}:${seconds
     .toString()
     .padStart(2, "0")}`;
   const progressBar = document.getElementById("timerProgress");
-  const percentage = (timer / 600) * 100;
+  const percentage = (window.timer / 600) * 100;
   progressBar.style.width = `${percentage}%`;
   progressBar.setAttribute("aria-valuenow", percentage);
-  if (timer > 300) {
+  if (window.timer > 300) {
     progressBar.className = "progress-bar bg-success";
-  } else if (timer > 120) {
+  } else if (window.timer > 120) {
     progressBar.className = "progress-bar bg-primary";
-  } else if (timer > 60) {
+  } else if (window.timer > 60) {
     progressBar.className = "progress-bar bg-warning";
   } else {
     progressBar.className = "progress-bar bg-danger";
@@ -680,123 +690,146 @@ function scoreGoal(team) {
 }
 
 function endMatch() {
-  clearInterval(timerInterval);
-  let winner, loser;
+  clearInterval(window.timerInterval);
+  let winner, loser, goalkeeper;
   if (
-    scoreA > scoreB ||
-    (scoreA === 0 && scoreB === 0 && lastWinner === "A" && nextTeams.length < 2)
+    window.scoreA > window.scoreB ||
+    (window.scoreA === window.scoreB && window.lastWinner === "A" && window.nextTeams.length < 2)
   ) {
-    winner = teamA;
-    loser = teamB;
-    lastWinner = "A";
+    winner = [...window.teamA];
+    loser = [...window.teamB];
+    window.lastWinner = "A";
+    goalkeeper = window.teamB[0]; // Preserva o goleiro do Time B
   } else if (
-    scoreB > scoreA ||
-    (scoreA === 0 && scoreB === 0 && lastWinner === "B" && nextTeams.length < 2)
+    window.scoreB > window.scoreA ||
+    (window.scoreA === window.scoreB && window.lastWinner === "B" && window.nextTeams.length < 2)
   ) {
-    winner = teamB;
-    loser = teamA;
-    lastWinner = "B";
-  } else if (scoreA === scoreB && nextTeams.length >= 2) {
-    winner = teamA;
-    loser = teamB;
-    lastWinner = "A";
+    winner = [...window.teamB];
+    loser = [...window.teamA];
+    window.lastWinner = "B";
+    goalkeeper = window.teamA[0]; // Preserva o goleiro do Time A
+  } else if (window.scoreA === window.scoreB && window.nextTeams.length >= 2) {
+    winner = [...window.teamA];
+    loser = [...window.teamB];
+    window.lastWinner = "A";
+    goalkeeper = window.teamB[0];
   } else {
-    winner = teamA;
-    loser = teamB;
-    lastWinner = "A";
+    winner = [...window.teamA];
+    loser = [...window.teamB];
+    window.lastWinner = "A";
+    goalkeeper = window.teamB[0];
   }
 
-  matchHistory.push({
-    teamA: [...teamA],
-    teamB: [...teamB],
-    scoreA,
-    scoreB,
-    winner: lastWinner,
-    goalScorers: [...goalScorers],
+  window.matchHistory.push({
+    teamA: [...window.teamA],
+    teamB: [...window.teamB],
+    scoreA: window.scoreA,
+    scoreB: window.scoreB,
+    winner: window.lastWinner,
+    goalScorers: [...window.goalScorers],
   });
 
-  const resultModal = new bootstrap.Modal(
-    document.getElementById("endMatchModal")
-  );
-  const scorersList =
-    goalScorers.length > 0
-      ? `<br/><h6>Marcadores:</h6><ul>${goalScorers
-          .map((scorer) => `<li>${scorer}</li>`)
-          .join("")}</ul>`
-      : "<p>Nenhum gol marcado.</p>";
-  document.getElementById("matchResult").innerHTML = `
-                <strong class="text-primary fs-5">Vencedor: Time ${lastWinner}</strong><br/>
-                <br/>Placar: Time A ${scoreA} x ${scoreB} Time B<br/>
-                <br/>Time A: ${teamA.join(", ")}<br/>
-                Time B: ${teamB.join(", ")}<br/>
+  const resultModal = document.getElementById("endMatchModal");
+  if (resultModal) {
+    const modalInstance = new bootstrap.Modal(resultModal);
+    const scorersList =
+      window.goalScorers.length > 0
+        ? `<br/><h6>Marcadores:</h6><ul>${window.goalScorers
+            .map((scorer) => `<li>${scorer}</li>`)
+            .join("")}</ul>`
+        : "<p>Nenhum gol marcado.</p>";
+    document.getElementById("matchResult").innerHTML = `
+                <strong class="text-primary fs-5">Vencedor: Time ${window.lastWinner}</strong><br/>
+                <br/>Placar: Time A ${window.scoreA} x ${window.scoreB} Time B<br/>
+                <br/>Time A: ${window.teamA.join(", ")}<br/>
+                Time B: ${window.teamB.join(", ")}<br/>
                 ${scorersList}
             `;
-  const audio = new Audio("aviso.mp3");
-  audio.play().catch((error) => console.error("Error playing sound:", error));
-  resultModal.show();
+    const audio = new Audio("aviso.mp3");
+    audio.play().catch((error) => console.error("Error playing sound:", error));
+    modalInstance.show();
+  } else {
+    console.error("Modal element #endMatchModal not found.");
+  }
 
   console.log("Before endMatch rotation:", {
-    teamA: [...teamA],
-    teamB: [...teamB],
-    nextTeams: JSON.stringify(nextTeams),
+    teamA: [...window.teamA],
+    teamB: [...window.teamB],
+    nextTeams: JSON.stringify(window.nextTeams),
+    winner: [...winner],
+    loser: [...loser],
   });
 
-  let nextTeam = nextTeams.shift() || [];
-  let newTeam = [...nextTeam];
-  const playersNeeded = 5 - nextTeam.length;
-  if (playersNeeded > 0) {
-    const shuffledLoser = shuffleArray([...loser]);
-    const completingPlayers = shuffledLoser.slice(0, playersNeeded);
-    newTeam = [...nextTeam, ...completingPlayers];
-    loser = shuffledLoser.slice(playersNeeded);
+  let nextTeam = window.nextTeams.length > 0 ? window.nextTeams.shift() : [];
+  let newTeam = nextTeam.slice(0, 4); // Limita a 4 jogadores
+  const playersNeeded = 4 - newTeam.length;
+  if (playersNeeded > 0 && loser.length > 1) {
+    const nonGoalkeeperLosers = loser.slice(1); // Exclui o goleiro
+    const shuffledLosers = shuffleArray([...nonGoalkeeperLosers]);
+    const completingPlayers = shuffledLosers.slice(0, playersNeeded);
+    newTeam = [...newTeam, ...completingPlayers];
+    // Remove os jogadores usados do time perdedor
+    loser = loser.filter(p => !completingPlayers.includes(p));
   }
-  if (lastWinner === "A") {
-    teamA = winner;
-    teamB = newTeam;
+
+  // Atualiza os times com base no vencedor
+  if (window.lastWinner === "A") {
+    window.teamA = [...winner];
+    window.teamB = [goalkeeper, ...newTeam];
   } else {
-    teamA = newTeam;
-    teamB = winner;
+    window.teamA = [goalkeeper, ...newTeam];
+    window.teamB = [...winner];
   }
-  if (loser.length > 0) {
-    nextTeams.push(loser); // Adiciona o time derrotado ao final da fila
+
+  // Adiciona os jogadores restantes do time perdedor ao nextTeams
+  if (loser.length > 1) {
+    const remainingLosers = loser.slice(1); // Remove o goleiro restante
+    if (remainingLosers.length > 0) {
+      const newNextTeam = remainingLosers.slice(0, 4); // Limita a 4 jogadores
+      if (newNextTeam.length > 0) {
+        window.nextTeams.push(newNextTeam);
+      }
+    }
   }
 
   console.log("After endMatch rotation:", {
-    teamA: [...teamA],
-    teamB: [...teamB],
-    nextTeams: JSON.stringify(nextTeams),
+    teamA: [...window.teamA],
+    teamB: [...window.teamB],
+    nextTeams: JSON.stringify(window.nextTeams),
   });
-  goalScorers = [];
+  window.goalScorers = [];
   updateTeamsDisplay();
-  scoreA = 0;
-  scoreB = 0;
-  timer = 600;
+  window.scoreA = 0;
+  window.scoreB = 0;
+  window.timer = 600;
   updateTimerDisplay();
 }
 
 function addPlayerDuringMatch() {
   const name = document.getElementById("newPlayerName").value.trim();
-  if (name && !players.includes(name)) {
-    players.push(name);
+  if (name && !window.players.some((p) => p.split(" (")[0] === name)) {
+    const numberedName = `${name} (${window.players.length + 1})`;
+    window.players.push(numberedName);
     let added = false;
-    for (let i = 0; i < nextTeams.length; i++) {
-      if (nextTeams[i].length < five) {
-        nextTeams[i].push(name);
+    for (let i = 0; i < window.nextTeams.length; i++) {
+      if (window.nextTeams[i].length < 4) { // Limite de 4 jogadores por próxima
+        window.nextTeams[i].push(numberedName);
         added = true;
         break;
       }
     }
     if (!added) {
-      nextTeams.push([name]);
+      window.nextTeams.push([numberedName]);
     }
     console.log("After addPlayerDuringMatch:", {
-      nextTeams: JSON.stringify(nextTeams),
+      nextTeams: JSON.stringify(window.nextTeams),
     });
     updateTeamsDisplay();
     document.getElementById("newPlayerName").value = "";
     bootstrap.Modal.getInstance(
       document.getElementById("addPlayerModal")
     ).hide();
+    saveState();
   }
 }
 
@@ -804,9 +837,9 @@ function endDay() {
   const statsDiv = document.getElementById("generalStats");
   statsDiv.innerHTML = `
                 <h4>Estatísticas do Dia</h4>
-                <p>Partidas jogadas: ${matchHistory.length}</p>
+                <p>Partidas jogadas: ${window.matchHistory.length}</p>
                 <p>Times mais vitoriosos: ${
-                  lastWinner === "A" ? "Time A" : "Time B"
+                  window.lastWinner === "A" ? "Time A" : "Time B"
                 }</p>
             `;
   showSection("stats");
