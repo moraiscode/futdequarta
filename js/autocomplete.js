@@ -92,8 +92,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (!window.players.some((p) => p.split(" (")[0] === name)) {
                   window.players.push(numberedName);
                   let added = false;
-                  for (let i = 0; i < window.nextTeams.length; i++) {
-                    if (window.nextTeams[i].length < 5) {
+                  for (let i = window.nextTeams.length - 1; i >= 0; i--) {
+                    if (window.nextTeams[i].length < 4) {
                       window.nextTeams[i].push(numberedName);
                       added = true;
                       break;
@@ -174,16 +174,21 @@ document.addEventListener("DOMContentLoaded", () => {
       const numberedName = `${name} (${window.players.length + 1})`;
       window.players.push(numberedName);
       let added = false;
-      for (let i = 0; i < window.nextTeams.length; i++) {
-        if (window.nextTeams[i].length < 5) {
+
+      // Procurar a última próxima com menos de 4 jogadores, começando do final
+      for (let i = window.nextTeams.length - 1; i >= 0; i--) {
+        if (window.nextTeams[i].length < 4) {
           window.nextTeams[i].push(numberedName);
           added = true;
           break;
         }
       }
+
+      // Se todas as próximas já têm 4 jogadores, criar uma nova próxima
       if (!added) {
         window.nextTeams.push([numberedName]);
       }
+
       window.updateTeamsDisplay();
       fetch(`players.php?action=add&name=${encodeURIComponent(name)}`)
         .then((res) => res.json())

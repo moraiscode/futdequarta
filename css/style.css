@@ -23,7 +23,8 @@ body {
   text-align: center;
   border-radius: 5px;
   margin-bottom: 10px;
-  font-size: 5rem;
+  font-size: 18vh;
+  font-weight: bold;
   margin-top: 5%;
 }
 .button-box {
@@ -238,4 +239,26 @@ button.pushy__btn {
   width: 100%;
   margin-bottom: 10px;
   /* color: black; */
+}
+
+button#pauseMatch {
+    margin-bottom: 10px;
+}
+
+.player-item[draggable="true"] {
+  cursor: move;
+}
+.player-item.drag-over {
+  background-color: #f0f0f0;
+}
+.substitute-btn {
+  margin-left: 10px;
+  cursor: pointer;
+}
+.substitute-dropdown {
+  display: none;
+  margin-left: 10px;
+}
+.substitute-dropdown.show {
+  display: inline-block;
 }
